@@ -1,0 +1,254 @@
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>İşletmePilot | İşletme Yönetimi</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f3f5fa;color:#20283a}
+header{background:#172554;color:white;padding:20px}
+header h1{margin:0;font-size:25px}
+header p{margin:7px 0 0;color:#cbd5e1}
+.layout{display:flex;min-height:calc(100vh - 85px)}
+nav{width:220px;background:#fff;padding:18px 12px}
+nav button{display:block;width:100%;padding:13px;margin-bottom:7px;border:0;border-radius:9px;background:white;text-align:left;font-size:15px;color:#334155}
+nav button.active,nav button:hover{background:#e9efff;color:#1d4ed8}
+main{flex:1;padding:25px;min-width:0}
+h2{margin-top:0}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:15px}
+.card,.panel{background:white;padding:19px;border-radius:14px;box-shadow:0 3px 15px #1725540b;margin-bottom:17px}
+.card small{color:#64748b}
+.number{font-size:27px;font-weight:bold;margin-top:12px}
+.panel{margin-top:20px}
+input,textarea,select{width:100%;padding:12px;margin:7px 0 13px;border:1px solid #dbe1ed;border-radius:8px;font-size:15px}
+textarea{min-height:85px}
+.action{background:#2455d6;color:white;border:0;padding:12px 17px;border-radius:8px;font-size:14px;cursor:pointer}
+.action:hover{background:#173fae}
+.secondary{background:#e8edfa;color:#2447a5}
+table{width:100%;border-collapse:collapse}
+td,th{text-align:left;padding:11px 7px;border-bottom:1px solid #edf0f5;font-size:14px}
+.muted{color:#64748b}
+.page{display:none}
+.page.active{display:block}
+.notice{background:#fff7df;padding:12px;border-radius:9px;color:#765514;font-size:13px}
+@media(max-width:650px){
+.layout{display:block}
+nav{width:100%;display:grid;grid-template-columns:repeat(2,1fr);gap:5px}
+nav button{margin:0}
+main{padding:15px}
+}
+</style>
+</head>
+<body>
+<header>
+<h1>✦ İşletmePilot</h1>
+<p>Akıllı işletme yönetim paneli</p>
+</header>
+
+<div class="layout">
+<nav>
+<button class="active" onclick="showPage('home',this)">🏠 Genel Bakış</button>
+<button onclick="showPage('customers',this)">👥 Müşteriler</button>
+<button onclick="showPage('appointments',this)">📅 Randevular</button>
+<button onclick="showPage('tasks',this)">☑️ Görevler</button>
+<button onclick="showPage('orders',this)">📦 Siparişler</button>
+<button onclick="showPage('social',this)">📱 Sosyal Medya</button>
+<button onclick="showPage('ai',this)">🤖 Yapay Zekâ</button>
+<button onclick="showPage('settings',this)">⚙️ Ayarlar</button>
+</nav>
+
+<main>
+<section id="home" class="page active">
+<h2>Genel Bakış</h2>
+<p class="muted">İşletmenizin günlük yönetim merkezi.</p>
+<div class="cards">
+<div class="card"><small>Toplam müşteri</small><div class="number" id="customerCount">0</div></div>
+<div class="card"><small>Randevular</small><div class="number" id="appointmentCount">0</div></div>
+<div class="card"><small>Görevler</small><div class="number" id="taskCount">0</div></div>
+<div class="card"><small>Siparişler</small><div class="number" id="orderCount">0</div></div>
+</div>
+<div class="panel">
+<h3>İşletmePilot'a hoş geldiniz!</h3>
+<p>Müşterilerinizi, randevularınızı, görevlerinizi ve siparişlerinizi tek panelden takip edin.</p>
+<p class="notice">Bu sürüm deneme sürümüdür. Veriler bu cihazın tarayıcısında saklanır; henüz çevrim içi hesap ve bulut sistemi bağlı değildir.</p>
+</div>
+</section>
+
+<section id="customers" class="page">
+<h2>Müşteri Yönetimi</h2>
+<div class="panel">
+<h3>Yeni müşteri ekle</h3>
+<input id="customerName" placeholder="Müşteri adı">
+<input id="customerPhone" placeholder="Telefon numarası">
+<button class="action" onclick="addItem('customers',['customerName','customerPhone'])">Müşteri ekle</button>
+</div>
+<div class="panel"><h3>Müşteri listesi</h3><div id="customerList"></div></div>
+</section>
+
+<section id="appointments" class="page">
+<h2>Randevu Yönetimi</h2>
+<div class="panel">
+<input id="appointmentName" placeholder="Müşteri adı">
+<input id="appointmentDate" type="datetime-local">
+<input id="appointmentNote" placeholder="Randevu notu">
+<button class="action" onclick="addItem('appointments',['appointmentName','appointmentDate','appointmentNote'])">Randevu ekle</button>
+</div>
+<div class="panel"><h3>Randevular</h3><div id="appointmentList"></div></div>
+</section>
+
+<section id="tasks" class="page">
+<h2>Görev Yönetimi</h2>
+<div class="panel">
+<input id="taskName" placeholder="Görev başlığı">
+<input id="taskDate" type="date">
+<button class="action" onclick="addItem('tasks',['taskName','taskDate'])">Görev ekle</button>
+</div>
+<div class="panel"><h3>Görev listesi</h3><div id="taskList"></div></div>
+</section>
+
+<section id="orders" class="page">
+<h2>Sipariş Yönetimi</h2>
+<div class="panel">
+<input id="orderName" placeholder="Ürün veya sipariş adı">
+<input id="orderAmount" type="number" placeholder="Tutar (TL)">
+<button class="action" onclick="addItem('orders',['orderName','orderAmount'])">Sipariş ekle</button>
+</div>
+<div class="panel"><h3>Sipariş listesi</h3><div id="orderList"></div></div>
+</section>
+
+<section id="social" class="page">
+<h2>Sosyal Medya İçerikleri</h2>
+<div class="panel">
+<h3>İçerik fikirleri</h3>
+<select id="socialType">
+<option>Instagram gönderisi</option>
+<option>Instagram hikâyesi</option>
+<option>TikTok videosu</option>
+<option>Facebook paylaşımı</option>
+</select>
+<input id="socialSubject" placeholder="İçerik konusu">
+<button class="action" onclick="makeContent()">İçerik taslağı oluştur</button>
+<textarea id="socialResult" placeholder="İçerik taslağınız burada görünecek"></textarea>
+<button class="action secondary" onclick="copyText('socialResult')">Metni kopyala</button>
+</div>
+</section>
+
+<section id="ai" class="page">
+<h2>Yapay Zekâ Asistanı</h2>
+<div class="panel">
+<h3>İşletmeniz için mesaj taslağı</h3>
+<textarea id="aiRequest" placeholder="Örneğin: Müşteriye randevu hatırlatma mesajı yaz."></textarea>
+<button class="action" onclick="makeMessage()">Mesaj taslağı hazırla</button>
+<textarea id="aiResult" placeholder="Hazırlanan taslak burada görünecek"></textarea>
+<button class="action secondary" onclick="copyText('aiResult')">Metni kopyala</button>
+<p class="muted">Bu ilk sürüm hazır şablonlarla çalışır. Gerçek yapay zekâ bağlantısı henüz yapılmamıştır.</p>
+</div>
+</section>
+
+<section id="settings" class="page">
+<h2>İşletme Ayarları</h2>
+<div class="panel">
+<label>İşletme adı</label>
+<input id="businessName" placeholder="İşletmenizin adı">
+<button class="action" onclick="saveBusiness()">Kaydet</button>
+<p id="businessSaved" class="muted"></p>
+</div>
+<div class="panel">
+<h3>Veri yönetimi</h3>
+<button class="action secondary" onclick="exportData()">Verileri indir</button>
+<p class="muted">Verilerinizin yedeğini JSON dosyası olarak alabilirsiniz.</p>
+</div>
+</section>
+</main>
+</div>
+
+<script>
+const keys=['customers','appointments','tasks','orders'];
+function getData(key){
+try{return JSON.parse(localStorage.getItem('ip_'+key)||'[]')}
+catch{return []}
+}
+function saveData(key,data){
+localStorage.setItem('ip_'+key,JSON.stringify(data));
+render();
+}
+function addItem(key,ids){
+const values=ids.map(id=>document.getElementById(id).value.trim());
+if(values.some(v=>!v)){alert('Lütfen gerekli alanları doldurun.');return}
+const data=getData(key);
+data.push({id:Date.now(),values});
+saveData(key,data);
+ids.forEach(id=>document.getElementById(id).value='');
+}
+function removeItem(key,id){
+if(!confirm('Bu kaydı silmek istiyor musunuz?'))return;
+saveData(key,getData(key).filter(x=>x.id!==id));
+}
+function renderList(key,id){
+const el=document.getElementById(id);
+const data=getData(key);
+if(!data.length){el.innerHTML='<p class="muted">Henüz kayıt yok.</p>';return}
+el.innerHTML='<table><tbody>'+data.map(item=>
+'<tr><td>'+item.values.map(v=>escapeHTML(v)).join(' · ')+'</td><td><button class="action secondary" onclick="removeItem(\''+key+'\','+item.id+')">Sil</button></td></tr>'
+).join('')+'</tbody></table>';
+}
+function escapeHTML(value){
+return String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function render(){
+document.getElementById('customerCount').textContent=getData('customers').length;
+document.getElementById('appointmentCount').textContent=getData('appointments').length;
+document.getElementById('taskCount').textContent=getData('tasks').length;
+document.getElementById('orderCount').textContent=getData('orders').length;
+renderList('customers','customerList');
+renderList('appointments','appointmentList');
+renderList('tasks','taskList');
+renderList('orders','orderList');
+}
+function showPage(id,button){
+document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+document.getElementById(id).classList.add('active');
+document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+button.classList.add('active');
+}
+function makeContent(){
+const type=document.getElementById('socialType').value;
+const subject=document.getElementById('socialSubject').value.trim();
+if(!subject){alert('Önce bir konu yazın.');return}
+document.getElementById('socialResult').value=
+type+' için içerik taslağı\n\n'+subject+' hakkında müşterilerimize faydalı bilgiler sunuyoruz. Detaylı bilgi almak için bizimle iletişime geçebilirsiniz.\n\n#işletme #hizmet #kalite';
+}
+function makeMessage(){
+const request=document.getElementById('aiRequest').value.trim();
+if(!request){alert('Önce ne istediğinizi yazın.');return}
+document.getElementById('aiResult').value=
+'Merhaba,\n\n'+request+'\n\nİlginiz için teşekkür eder, iyi günler dileriz.';
+}
+function copyText(id){
+const el=document.getElementById(id);
+if(!el.value){alert('Kopyalanacak metin yok.');return}
+if(navigator.clipboard&&navigator.clipboard.writeText){
+navigator.clipboard.writeText(el.value).then(()=>alert('Metin kopyalandı.')).catch(()=>{el.select();document.execCommand('copy');alert('Metin kopyalandı.')});
+}else{el.select();document.execCommand('copy');alert('Metin kopyalandı.')}
+}
+function saveBusiness(){
+localStorage.setItem('ip_business',document.getElementById('businessName').value);
+document.getElementById('businessSaved').textContent='İşletme adı kaydedildi.';
+}
+function exportData(){
+const backup={};
+keys.forEach(k=>backup[k]=getData(k));
+backup.business=localStorage.getItem('ip_business')||'';
+const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json'});
+const url=URL.createObjectURL(blob);
+const a=document.createElement('a');
+a.href=url;a.download='isletmepilot-yedek.json';a.click();
+URL.revokeObjectURL(url);
+}
+document.getElementById('businessName').value=localStorage.getItem('ip_business')||'';
+render();
+</script>
+</body>
+</html>
